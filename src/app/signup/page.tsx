@@ -1,7 +1,9 @@
 "use client";
+import axios from "axios";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Script from "next/script";
-import React from "react";
+import React, { useEffect } from "react";
 
 export default function SignupPage() {
   const [user, setUser] = React.useState({
@@ -9,8 +11,30 @@ export default function SignupPage() {
     email: "",
     password: "",
   });
+  const [buttonDisabled, setButtonDisabled] = React.useState(false);
+  const router = useRouter();
 
-  const onSignup = async () => {};
+  const onSignup = async () => {
+    try {
+      const response = await axios.post("/api/users/signup", user);
+      console.log("Signup Succeesfull", response.data);
+      router.push("/login");
+    } catch (error: any) {
+      console.log("User didn't signup", error.message);
+    }
+  };
+
+  useEffect(() => {
+    if (
+      user.username.length > 0 &&
+      user.email.length > 0 &&
+      user.password.length > 0
+    ) {
+      setButtonDisabled(false);
+    } else {
+      setButtonDisabled(true);
+    }
+  });
 
   return (
     <div className="h-screen bg-blue-300 flex justify-center items-center">
@@ -55,7 +79,7 @@ export default function SignupPage() {
             onClick={onSignup}
             className="bg-blue-500 text-white font-semibold p-2 rounded w-80 hover:bg-blue-600"
           >
-            Signup
+            {buttonDisabled ? "Fill in the form" : "Signup"}
           </button>
           <div className="mt-2">
             Already, have an account ?{" "}

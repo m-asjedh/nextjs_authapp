@@ -1,15 +1,35 @@
 "use client";
+import axios from "axios";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Script from "next/script";
-import React from "react";
+import React, { useEffect } from "react";
 
 export default function LoginPage() {
   const [user, setUser] = React.useState({
     username: "",
     password: "",
   });
+  const router = useRouter();
+  const [buttonDisabled, setButtonDisabled] = React.useState(false);
 
-  const onLogin = async () => {};
+  const onLogin = async () => {
+    try {
+      const resposne = await axios.post("/api/users/login", user);
+      console.log("Login Succeesfull", resposne.data);
+      router.push("/profile");
+    } catch (error: any) {
+      console.log("User didn't login", error.message);
+    }
+  };
+
+  useEffect(() => {
+    if (user.username.length > 0 && user.password.length > 0) {
+      setButtonDisabled(false);
+    } else {
+      setButtonDisabled(true);
+    }
+  }, []);
 
   return (
     <div className="h-screen bg-blue-300 flex justify-center items-center">
@@ -47,7 +67,7 @@ export default function LoginPage() {
             onClick={onLogin}
             className="bg-blue-500 text-white font-semibold p-2 rounded w-80 hover:bg-blue-600"
           >
-            Login
+            {buttonDisabled ? "Fill the form" : "Login"}
           </button>
           <div className="mt-2">
             Don’t have an account ?{" "}
